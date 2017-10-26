@@ -1,5 +1,6 @@
-import httplib
-import urllib
+# -*- coding: cp1251 -*-
+import http.client
+import urllib.request, urllib.parse, urllib.error
 import json
 import datetime
 import time
@@ -14,7 +15,7 @@ def get_vk(latitude, longitude, distance, min_timestamp, max_timestamp):
     get_request+= '&start_time=' + str(min_timestamp)
     get_request+= '&end_time=' + str(max_timestamp)
     get_request+= '&sort=0'
-    local_connect = httplib.HTTPSConnection('api.vk.com', 443)
+    local_connect = http.client.HTTPSConnection('api.vk.com', 443)
     local_connect.request('GET', get_request)
     return local_connect.getresponse().read()
 
@@ -22,9 +23,9 @@ def timestamptodate(timestamp):
     return datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')+' UTC'
 
 def parse_vk(location_latitude, location_longitude, distance, min_timestamp, max_timestamp, date_increment):
-    print 'Starting parse vkontakte..'
-    print 'GEO:',location_latitude,location_longitude
-    print 'TIME: from',timestamptodate(min_timestamp),'to',timestamptodate(max_timestamp)
+    print('Starting parse vkontakte..')
+    print('GEO:',location_latitude,location_longitude)
+    print('TIME: from',timestamptodate(min_timestamp),'to',timestamptodate(max_timestamp))
     resultdir =datetime.datetime.strftime(datetime.datetime.now(), "y%Ym%md%d h%Hm%Ms%S")
     os.makedirs(resultdir)
     file_inst = open('vk_'+location_latitude+location_longitude+'.html','w')
@@ -36,7 +37,7 @@ def parse_vk(location_latitude, location_longitude, distance, min_timestamp, max
         local_max_timestamp = local_min_timestamp + date_increment
         if ( local_max_timestamp > max_timestamp ):
             local_max_timestamp = max_timestamp
-        print timestamptodate(local_min_timestamp),'-',timestamptodate(local_max_timestamp)
+        print(timestamptodate(local_min_timestamp),'-',timestamptodate(local_max_timestamp))
         vk_json = json.loads(get_vk(location_latitude, location_longitude, distance, local_min_timestamp, local_max_timestamp))
         for local_i in vk_json['response']:
             if type(local_i) is int:
